@@ -1,18 +1,25 @@
-from pydantic import BaseModel
-from datetime import datetime
+from fastapi import File, UploadFile
 
-class TestBase(BaseModel):
+from pydantic import BaseModel
+
+
+class CatCreate(BaseModel):
+    comment: str
+    image: UploadFile = File(None)
+
     x: int
     y: int
-    storage_URL: str
+
+class CatResponse(BaseModel):
+    x: int
+    y: int
+    created_at: str
     comment: str
-    created_at: datetime
+    url: str
 
-class TestCreate(TestBase):
-    pass
-
-class Test(TestBase):
     geo_id: int
-    
-    class config:
+
+    class Config:
         orm_mode = True
+
+
