@@ -9,7 +9,7 @@ from .. aws.s3 import upload_file, create_presigned_url
 router = APIRouter()
 
 
-@router.post("/content-create/")
+@router.post("/content-create/", description="file upload 및 db에 content 추가.")
 def create_content(request: schemas.CatCreate, db: Session = Depends(get_db)):
     if not request.image:
         raise HTTPException(
@@ -21,7 +21,7 @@ def create_content(request: schemas.CatCreate, db: Session = Depends(get_db)):
     crud.create_cat(db, request, presigned_url)
 
 
-@router.get("/", response_model= list[schemas.CatResponse])
+@router.get("/", response_model= list[schemas.CatResponse], description="db의 record를 읽어온다.")
 def get_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     response = crud.get_cat(db=db, skip=skip, limit=limit)
     if response is None:
