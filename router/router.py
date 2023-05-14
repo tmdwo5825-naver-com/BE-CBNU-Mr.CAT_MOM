@@ -18,7 +18,7 @@ def create_content(request: schemas.CatCreate, db: Session = Depends(get_db)):
         )
     obj_name = upload_file(request.image)
     presigned_url = create_presigned_url("s3-cbnu-cat-mom", obj_name)
-    crud.create_cat(db,request)
+    crud.create_cat(db, request, presigned_url)
 
 
 @router.get("/", response_model= list[schemas.Test])
