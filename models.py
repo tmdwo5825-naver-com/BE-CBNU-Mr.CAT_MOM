@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, VARCHAR, DateTime, text
-from .database import Base
+from .database.db import Base
+
 
 class Cat(Base):
     __tablename__ = "Cat_mom"
