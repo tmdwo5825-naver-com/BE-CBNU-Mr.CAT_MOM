@@ -17,13 +17,15 @@ def create_content(request: schemas.CatCreate, db: Session = Depends(get_db)):
             detail="No image found"
         )
     obj_name = upload_file(request.image)
-    presigned_url = create_presigned_url("s3-cbnu-cat-mom", obj_name)
-    crud.create_cat(db, request, presigned_url)
+    crud.create_cat(db, request, obj_name)
 
 
 @router.get("/", response_model= list[schemas.CatResponse], description="db의 record를 읽어온다.")
 def get_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    response = crud.get_cat(db=db, skip=skip, limit=limit)
+    response: schemas.CatResponse = crud.get_cat(db=db, skip=skip, limit=limit)
     if response is None:
         raise HTTPException(status_code=404, detail= "content not found")
+    for i in response:
+        response.url = create_presigned_url('s3', response.obj_name)
+
     return response
