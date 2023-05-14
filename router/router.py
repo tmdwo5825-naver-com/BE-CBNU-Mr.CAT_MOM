@@ -1,8 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from .. common.dependencies import get_db
+from .. import schemas, crud
 
-@app.post("/content-create/")
+router = APIRouter()
+
+
+@router.post("/content-create/")
 def create_dummy(request: schemas.CatCreate, db: Session = Depends(get_db) ):
     if not request.image:
         raise HTTPException(
@@ -11,7 +16,8 @@ def create_dummy(request: schemas.CatCreate, db: Session = Depends(get_db) ):
         )
     crud.create_cat(db,request)
 
-@app.get("/", response_model= list[schemas.Test])
+
+@router.get("/", response_model= list[schemas.Test])
 def get_dummy(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     response = crud.get_cat(db= db, skip= skip, limit= limit)
     if response is None:
