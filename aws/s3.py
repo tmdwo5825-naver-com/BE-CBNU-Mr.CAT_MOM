@@ -8,6 +8,8 @@ import boto3
 import logging
 from botocore.exceptions import ClientError
 
+import uuid
+
 
 path = Path(__file__)
 ROOT_DIR = path.parent.absolute()
@@ -30,22 +32,27 @@ response = s3.list_buckets()
 for bucket in response['Buckets']:
     print(f' {bucket["Name"]}')
 
-def upload_file(image: UploadFile, created_at: str):
+
+def upload_file(image: UploadFile) -> str:
     image = BytesIO()
     image.seek()
+
+    obj_name = uuid.uuid1()
+
     s3.upload_fileobj(
         image,
         "s3-cbnu-cat-mom",
-        created_at
+        obj_name
     )
+    return obj_name
 
 
-def create_presigned_url(bucket_name, object_name, expiration=86400):
+def create_presigned_url(bucket_name, obj_name, expiration=1800):
     s3_client = boto3.client('s3')
     try:
         url = s3_client.generate_presigned_url('get_object',
                                                     Params={'Bucket': bucket_name,
-                                                            'Key': object_name},
+                                                            'Key': obj_name},
                                                     ExpiresIn=expiration)
     except ClientError as e:
         logging.error(e)
