@@ -3,7 +3,7 @@ from .database.db import Base
 
 
 class Cat(Base):
-    __tablename__ = "Cat_mom"
+    __tablename__ = "cat_mom"
     geo_id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     created_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP'))
     obj_name = Column(VARCHAR(500))
