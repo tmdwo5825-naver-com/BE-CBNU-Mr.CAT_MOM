@@ -10,6 +10,7 @@ from .. import schemas, crud
 
 from .. aws.s3 import upload_file, create_presigned_url
 
+
 models.Base.metadata.create_all(bind = engine)
 
 
