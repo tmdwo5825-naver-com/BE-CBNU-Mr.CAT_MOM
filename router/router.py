@@ -1,10 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from .. import models
+from .. database.set_mysql import engine
+
+
 from .. common.dependencies import get_db
 from .. import schemas, crud
 
 from .. aws.s3 import upload_file, create_presigned_url
+
+
+models.Base.metadata.create_all(bind = engine)
 
 
 router = APIRouter()
