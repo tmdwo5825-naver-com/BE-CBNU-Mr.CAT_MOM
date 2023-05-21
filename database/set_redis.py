@@ -1,22 +1,12 @@
-import os
-import  configparser
-from pathlib import Path
+from .. core.config import settings
 import redis
-
-path = Path(__file__)
-ROOT_DIR = path.parent.absolute()
-config_path = os.path.join(ROOT_DIR, "redis/config.ini")
-
-config = configparser.ConfigParser()
-config.read(config_path)
-
-host = config('redis', 'host')
-port = config('redis', 'port')
-database = config('redis', 'database')
 
 
 def get_redis():
-
-    rd = redis.Redis(host=host, port=port, db=database)
+    rd = redis.Redis(
+        host=settings.redis_host,
+        port=settings.redis_port,
+        db=settings.redis_database
+    )
     return rd
 
