@@ -1,4 +1,5 @@
 from pydantic import BaseSettings
+import os
 
 
 class Settings(BaseSettings):
@@ -16,7 +17,7 @@ class Settings(BaseSettings):
     aws_secret_access_key: str
 
     class Config:
-        evn_file = ".env"
+        env_file = f"{os.path.dirname(os.path.abspath(__file__))}/.env"
 
 
 settings = Settings()
