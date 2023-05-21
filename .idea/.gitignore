@@ -7,6 +7,4 @@
 /dataSources/
 /dataSources.local.xml
 
-database/config.ini
-
-aws/config.ini
+core/.env
