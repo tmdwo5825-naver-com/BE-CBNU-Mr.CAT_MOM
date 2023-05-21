@@ -1,31 +1,18 @@
-import configparser
-import os
-from pathlib import Path
-
 from fastapi import UploadFile, File
 from io import BytesIO
 import boto3
 import logging
 from botocore.exceptions import ClientError
+from ..core.config import settings
 
 import uuid
 
 
-path = Path(__file__)
-ROOT_DIR = path.parent.absolute()
-config_path = os.path.join(ROOT_DIR, "config.ini")
-
-config = configparser.ConfigParser()
-config.read(config_path)
-
-AWS_ACCESS_KEY_ID = config.get('s3', 'aws_access_key_id')
-AWS_SECRET_ACCESS_KEY = config.get('s3', 'aws_secret_access_key')
-
 s3 = boto3.client(
     's3',
-    region_name = 'ap-northeast-2',
-    aws_access_key_id = AWS_ACCESS_KEY_ID,
-    aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+    region_name='ap-northeast-2',
+    aws_access_key_id=settings.aws_access_key_id,
+    aws_secret_access_key=settings.aws_secret_access_key
 )
 
 
