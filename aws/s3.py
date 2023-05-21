@@ -18,19 +18,15 @@ config_path = os.path.join(ROOT_DIR, "config.ini")
 config = configparser.ConfigParser()
 config.read(config_path)
 
-aws_access_key_id=config.get('s3', 'aws_access_key_id')
-aws_secret_access_key=config.get('s3', 'aws_secret_access_key')
+AWS_ACCESS_KEY_ID = config.get('s3', 'aws_access_key_id')
+AWS_SECRET_ACCESS_KEY = config.get('s3', 'aws_secret_access_key')
 
 s3 = boto3.client(
     's3',
-    aws_access_key_id,
-    aws_secret_access_key
+    region_name = 'ap-northeast-2',
+    aws_access_key_id = AWS_ACCESS_KEY_ID,
+    aws_secret_access_key = AWS_SECRET_ACCESS_KEY
 )
-
-response = s3.list_buckets()
-
-for bucket in response['Buckets']:
-    print(f' {bucket["Name"]}')
 
 
 def upload_file(image: UploadFile) -> str:
@@ -50,10 +46,13 @@ def upload_file(image: UploadFile) -> str:
 def create_presigned_url(bucket_name, obj_name, expiration=1800):
     s3_client = boto3.client('s3')
     try:
-        url = s3_client.generate_presigned_url('get_object',
-                                                    Params={'Bucket': bucket_name,
-                                                            'Key': obj_name},
-                                                    ExpiresIn=expiration)
+        url = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name,
+                    'Key': obj_name},
+            ExpiresIn=expiration
+            )
+
     except ClientError as e:
         logging.error(e)
         return None
