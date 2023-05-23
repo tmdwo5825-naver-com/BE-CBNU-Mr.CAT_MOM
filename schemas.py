@@ -1,12 +1,11 @@
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, Form
 
 from pydantic import BaseModel
 
 
 class CatCreate(BaseModel):
     comment: str
-    image: UploadFile = File(None)
-
+    image_url: str
     x: int
     y: int
 
@@ -17,7 +16,6 @@ class CatResponse(BaseModel):
     created_at: str
     comment: str
     url: str
-    obj_name: str
 
     geo_id: int
 
