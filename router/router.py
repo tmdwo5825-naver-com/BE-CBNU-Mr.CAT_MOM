@@ -1,5 +1,5 @@
 from tempfile import NamedTemporaryFile
-
+from fastapi import File, UploadFile
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.orm import Session
 from typing import IO
@@ -13,7 +13,9 @@ from .. import schemas, crud
 
 from .. aws.s3 import upload_file, create_presigned_url
 
-from fastapi import File, UploadFile
+
+models.Base.metadata.create_all(bind = engine)
+
 
 from ..core.config import settings
 
