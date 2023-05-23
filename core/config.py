@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     aws_access_key_id: str
     aws_secret_access_key: str
 
+    s3_bucket_name: str
+    s3_location: str
+
     class Config:
         env_file = f"{os.path.dirname(os.path.abspath(__file__))}/.env"
 

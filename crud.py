@@ -3,12 +3,11 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 
 
-def create_cat(db: Session, cat: schemas.CatCreate, obj_name: str = None):
+def create_cat(db: Session, cat: schemas.CatCreate):
     db_cat = models.Cat(
-        created_at=cat.created_at,
         x=cat.x,
         y=cat.y,
-        obj_name=obj_name,
+        image_url=cat.image_url,
         comment=cat.comment
     )
     db.add(db_cat)
