@@ -10,7 +10,7 @@ from .. database.set_mysql import engine
 
 from .. common.dependencies import get_db
 from .. import schemas
-from app.crud.crud_cat import CrudCat
+from app.crud.crud_cat import crud_cat
 
 from .. aws.s3 import upload_file
 
@@ -48,14 +48,25 @@ async def create_content(
 
     # db 저장
     request = schemas.CatCreate(comment=comment, image_url=image_url, x=x, y=y)
-    CrudCat.create_24h_content(db, request)
+    crud_cat.create_24h_content(db, request)
+
+    # redis 저장
+    crud_cat.create_3h_content(request)
 
     return HTTPException(status_code=status.HTTP_201_CREATED)
 
 
+@router.get("/test/post")
+def test():
+    response = crud_cat.get_3h()
+    print(response)
+    return status.HTTP_200_OK
+
+
+
 @router.get("/", response_model= list[schemas.CatResponse], description="db의 record를 읽어온다.")
 def get_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    response: schemas.CatResponse = CrudCat.get_24h(db, skip, limit)
+    response: schemas.CatResponse = crud_cat.get_24h(db, skip, limit)
     if response is None:
         raise HTTPException(status_code=404, detail= "content not found")
 
