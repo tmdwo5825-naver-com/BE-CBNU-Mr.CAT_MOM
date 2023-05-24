@@ -1,7 +1,8 @@
 import boto3
 from botocore.exceptions import ClientError
-from ..core.config import settings
+from botocore.exceptions import NoCredentialsError
 import uuid
+from app.core.config import settings
 
 
 def s3_connection():
@@ -26,13 +27,17 @@ def upload_file(file_path: str) -> str:
         s3.upload_file(
             file_path,
             settings.s3_bucket_name,
-            obj_name.hex
+            obj_name.hex,
+            ExtraArgs={'ACL':'public-read'}
         )
+        print("uploaded file!")
 
     except ClientError as e:
         print(f'Credential error => {e}')
     except Exception as e:
         print(f"Another error => {e}")
+    except NoCredentialsError as e:
+        print(e)
 
     return obj_name.hex
 
