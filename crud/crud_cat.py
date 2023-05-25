@@ -32,21 +32,25 @@ class CrudCat():
         r.zadd('data_ids', {f'data:{data_id}': data_id})
 
         # 필드와 값을 함께 저장
-        r.hset(f'data:{data_id}', 'image_url', cat_in.image_url)
-        r.hset(f'data:{data_id}', 'comment', cat_in.comment)
-        r.hset(f'data:{data_id}', 'x', cat_in.x)
-        r.hset(f'data:{data_id}', 'y', cat_in.y)
+        data = {
+            'image_url': cat_in.image_url,
+            'comment': cat_in.comment,
+            'x': cat_in.x,
+            'y': cat_in.y
+        }
+        r.hmset(data_id, data)
+        r.expire(data_id, 10)
 
     # noinspection PyMethodMayBeStatic
     def get_3h(self):
         r = get_redis()
 
         # 모든 데이터 ID 가져 오기
-        data_ids = r.zrange('data_ids', 0, -1)
+        data_ids = r.zcard('data_ids')
 
         # 데이터 복원
         all_data = []
-        for data_id in data_ids:
+        for data_id in range(0, data_ids):
             data = r.hgetall(data_id)
             all_data.append(data)
 
