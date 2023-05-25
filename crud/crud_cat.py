@@ -11,7 +11,8 @@ class CrudCat():
             x=cat_in.x,
             y=cat_in.y,
             image_url=cat_in.image_url,
-            comment=cat_in.comment
+            comment=cat_in.comment,
+            cat_tower=cat_in.cat_tower
         )
         db.add(db_cat)
         db.commit()
