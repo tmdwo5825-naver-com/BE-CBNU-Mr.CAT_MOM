@@ -37,6 +37,7 @@ class CrudCat():
             'y': cat_in.y,
             'cat_tower': cat_in.cat_tower
         }
+        # key 값을 image_url 로 설정함
         r.hmset(cat_in.image_url, data)
         r.expire(f'{cat_in.image_url}', 30)
 
