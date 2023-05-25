@@ -9,7 +9,7 @@ async def save_file(file: IO):
         return tempfile.name
 
 
-def check_location(x, y):
+def check_location(x, y) -> str:
     def haversine(lat1, lon1, lat2, lon2):
         R = 6371  # 지구의 반경(단위: km)
 
@@ -32,13 +32,13 @@ def check_location(x, y):
 
     # 입력된 좌표와 각 지점의 거리를 계산하여 200m 반경 이내인 경우 해당 지점 이름을 반환
     if haversine(x, y, *yangsungjae) <= 0.2:
-        return "양성재"
+        return "yang"
     elif haversine(x, y, *n14) <= 0.2:
-        return "n14쪽"
+        return "n14"
     elif haversine(x, y, *jungdo_solt) <= 0.2:
-        return "중도 or 솔못"
+        return "lib"
     else:
-        return "그 외"
+        return "else"
 
 
 

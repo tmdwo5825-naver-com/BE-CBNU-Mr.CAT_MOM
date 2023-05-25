@@ -1,22 +1,21 @@
-from fastapi import File, UploadFile, Form
-
 from pydantic import BaseModel
 
 
 class CatCreate(BaseModel):
     comment: str
     image_url: str
-    x: int
-    y: int
+    x: float
+    y: float
+    cat_tower: str
 
 
 class CatResponse(BaseModel):
-    x: int
-    y: int
+    x: float
+    y: float
     created_at: str
     comment: str
     url: str
-
+    cat_tower: str
     geo_id: int
 
     class Config:

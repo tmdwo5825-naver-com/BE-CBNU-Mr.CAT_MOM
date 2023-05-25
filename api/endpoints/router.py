@@ -10,7 +10,7 @@ from app.crud.crud_cat import crud_cat
 from app.aws.s3 import upload_file
 from app.core.config import settings
 from app.database.set_mysql import engine
-from app.api.deps import save_file
+from app.api.deps import save_file, check_location
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -21,8 +21,8 @@ router = APIRouter()
 @router.post("/content-create/", description="file upload 및 db에 content 추가.")
 async def create_content(
         comment: str = Form(),
-        x: int = Form(),
-        y: int = Form(),
+        x: float = Form(),
+        y: float = Form(),
         image: UploadFile = File(None),
         db: Session = Depends(get_db)
 ):
@@ -31,14 +31,19 @@ async def create_content(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No image found"
         )
+
     # 파일 처리 부분
     path = await save_file(image.file)
     obj_name = upload_file(path)
 
     image_url = f'https://{settings.s3_bucket_name}.s3.{settings.s3_location}.amazonaws.com/{obj_name}'
 
+    # 객체 처리
+    cat_tower = check_location(x, y)
+    print(cat_tower)
+    request = schemas.CatCreate(comment=comment, image_url=image_url, x=x, y=y, cat_tower=cat_tower)
+
     # db 저장
-    request = schemas.CatCreate(comment=comment, image_url=image_url, x=x, y=y)
     crud_cat.create_24h_content(db, request)
 
     # redis 저장

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, VARCHAR, DateTime, text
+from sqlalchemy import Column, Integer, VARCHAR, DateTime, text, FLOAT
 
 from .database.set_mysql import Base
 
@@ -9,6 +9,7 @@ class Cat(Base):
     created_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP'))
     image_url = Column(VARCHAR(500))
     comment = Column(VARCHAR(500), nullable=True)
-    x = Column(Integer)
-    y = Column(Integer)
+    x = Column(FLOAT)
+    y = Column(FLOAT)
+    cat_tower = Column(VARCHAR(100))
 
