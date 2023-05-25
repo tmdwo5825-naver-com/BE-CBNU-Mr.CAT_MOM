@@ -37,6 +37,10 @@ def check_location(x, y):
         return "n14쪽"
     elif haversine(x, y, *jungdo_solt) <= 0.2:
         return "중도 or 솔못"
+    else:
+        return "그 외"
+
+
 
 
 
