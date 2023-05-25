@@ -1,30 +1,21 @@
-from tempfile import NamedTemporaryFile
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from fastapi import File, UploadFile
 from sqlalchemy.orm import Session
-from typing import IO
 
-from .. import models
-from .. database.set_mysql import engine
+from app import models
+from app import schemas
 
-
-from .. common.dependencies import get_db
-from .. import schemas
+from app.common.dependencies import get_db
 from app.crud.crud_cat import crud_cat
+from app.aws.s3 import upload_file
+from app.core.config import settings
+from app.database.set_mysql import engine
+from app.api.deps import save_file
 
-from .. aws.s3 import upload_file
 
-from ..core.config import settings
-
-models.Base.metadata.create_all(bind = engine)
+models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
-
-
-async def save_file(file: IO):
-    with NamedTemporaryFile("wb", delete=False) as tempfile:
-        tempfile.write(file.read())
-        return tempfile.name
 
 
 @router.post("/content-create/", description="file upload 및 db에 content 추가.")
@@ -60,8 +51,8 @@ async def create_content(
 def test():
     response = crud_cat.get_3h()
     print(response)
-    return status.HTTP_200_OK
 
+    return status.HTTP_200_OK
 
 
 @router.get("/", response_model= list[schemas.CatResponse], description="db의 record를 읽어온다.")
