@@ -27,20 +27,22 @@ class CrudCat():
     def create_3h_content(self, cat_in: schemas.CatCreate):
         r = get_redis()
 
-        data_id = r.zcard('data_ids') + 1
-
-        # 데이터 ID를 Sorted Set에 추가
-        r.zadd('data_ids', {f'data:{data_id}': data_id})
+        count = r.dbsize()
 
         # 필드와 값을 함께 저장
         data = {
             'image_url': cat_in.image_url,
             'comment': cat_in.comment,
             'x': cat_in.x,
-            'y': cat_in.y
+            'y': cat_in.y,
+            'cat_tower': cat_in.cat_tower
         }
-        r.hmset(data_id, data)
-        r.expire(data_id, 10)
+        r.hmset(cat_in.image_url, data)
+        r.expire(f'{cat_in.image_url}', 30)
+
+        result = r.hmget(f'{cat_in.image_url}', 'image_url', 'comment', 'x', 'y', 'cat_tower')
+        print(result)
+        print(count)
 
     # noinspection PyMethodMayBeStatic
     def get_3h(self):
