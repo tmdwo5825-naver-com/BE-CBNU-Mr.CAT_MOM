@@ -1,6 +1,18 @@
+
 from tempfile import NamedTemporaryFile
 from typing import IO
 from math import radians, sin, cos, sqrt, atan2
+
+
+from .. database.set_mysql import SessionLocal
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 async def save_file(file: IO):
@@ -40,14 +52,16 @@ def check_location(x, y) -> str:
     else:
         return "else"
 
-
-
-
-
-
+##########
 # 양성재 : 위도 : 36.62785410610158, 경도 : 127.45313788589664
 # to 경도 127.45369324608023 or 60m
 # n14쪽 : 좌표 : 위도 : 36.63054690049551, 경도 : 127.4568566387854
 # to  경도 : 127.45804532282344 or 60m
 # 중도 or 솔못 :좌표 : 위도 : 36.628825506703954, 경도 : 127.45738760306085
 # to 경도 : 127.45896785024753 or 100m
+##########
+
+
+
+
+
