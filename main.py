@@ -3,7 +3,6 @@ import os
 current_directory = os.getcwd()
 os.environ['PYTHONPATH'] = current_directory
 
-
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from app.api.endpoint import router
