@@ -18,7 +18,7 @@ models.Base.metadata.create_all(bind=engine)
 router = APIRouter()
 
 
-@router.post("/content-create/", description="file upload 및 db에 content 추가.")
+@router.post("/content-create/", description="file upload 및 mysql db,redis db에 content 추가.")
 async def create_content(
         comment: str = Form(default=None, description="사진에 추가할 코멘트"),
         x: float = Form(description="float형 경도"),
@@ -51,16 +51,22 @@ async def create_content(
     return HTTPException(status_code=status.HTTP_201_CREATED)
 
 
-@router.get("/") #response_model= list[schemas.CatResponse], description="3시간 이내의 데이터를 조회한다."
+# 3시간 이내 데이터 조회
+@router.get("/", description="3시간 이내의 데이터를 조회한다.")
 def get_3h_contents():
-    r = get_redis()
-    crud_cat.get_3h()
-    # response = crud_cat.get_3h()
+    response = crud_cat.get_3h()
 
-    # raise HTTPException(status_code=status.HTTP_200_OK)
-    # return response
+    return response
 
 
+# 24시간 데이터 조회
+@router.get("/today", response_model= list[schemas.CatResponse])
+def get_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    response: schemas.CatResponse = crud_cat.get_24h(db, skip, limit)
+    if response is None:
+        raise HTTPException(status_code=404, detail= "content not found")
+
+    return response
 
 
 @router.post("/test")
@@ -80,8 +86,13 @@ async def create_content(
 
     # 객체 처리
     cat_tower = check_location(x, y)
-    print(cat_tower)
+
+
+    # print(cat_tower)
     request = schemas.CatCreate(comment=comment, image_url=image_url, x=x, y=y, cat_tower=cat_tower)
+
+    crud_cat.create_3h_content(request)
+    return HTTPException(status_code=status.HTTP_201_CREATED)
     # request_json = test(comment=request.comment, url=request.image_url)
     #print(request_json)
     #json_str = str(json_form)
@@ -93,21 +104,6 @@ async def create_content(
 
 @router.get("/test/get")
 def get():
-    response = []
-    data = schemas.CatResponse(x=36.65, y=34.566, image_url="alsdkjf", comment="asdf")
-    response.append(data)
-    return {data: response}
+    return crud_cat.get_3h()
 
 
-
-
-
-
-# 3시간 데이터 조회
-@router.get("/today", response_model= list[schemas.CatResponse])
-def get_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    response: schemas.CatResponse = crud_cat.get_24h(db, skip, limit)
-    if response is None:
-        raise HTTPException(status_code=404, detail= "content not found")
-
-    return response
