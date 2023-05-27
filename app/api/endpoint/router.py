@@ -3,14 +3,12 @@ from fastapi import File, UploadFile
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-
-from app.common.dependencies import get_db
 from app.crud.crud_cat import crud_cat
 from app.aws.s3 import upload_file
 from app.core.config import settings
 from app.database.set_mysql import engine
-from app.api.deps import save_file, check_location
-from app.database.set_redis import get_redis
+from app.api.deps import save_file, check_location, get_db
+
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -56,20 +54,17 @@ async def create_content(
 def get_3h_contents():
     response = crud_cat.get_3h()
 
-    return response
+    return {"data": response}
 
 
 # 24시간 데이터 조회
-@router.get("/today", response_model= list[schemas.CatResponse])
-def get_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    response: schemas.CatResponse = crud_cat.get_24h(db, skip, limit)
-    if response is None:
-        raise HTTPException(status_code=404, detail= "content not found")
+@router.get("/today", description="24시간 이내의 데이터를 조회한다.")
+def get_content(db: Session = Depends(get_db)):
+    response = crud_cat.get_24h(db)
+    return {"data": response}
 
-    return response
-
-
-@router.post("/test")
+# 테스트
+@router.post("/test", description="테스트를 위한 api")
 async def create_content(
         comment: str = Form(default=None, description="사진에 추가할 코멘트"),
         x: float = Form(description="float형 경도"),
@@ -101,9 +96,9 @@ async def create_content(
     #r.execute_command("JSON.SET", 'item'+request.image_url, '.', json.dumps(json_form))
 
 
-
-@router.get("/test/get")
-def get():
-    return crud_cat.get_3h()
-
+# 테스트
+@router.get("/test/get", description="test를 위한 api")
+def get(db: Session = Depends(get_db)):
+    recent_data = crud_cat.get_24h(db)
+    return recent_data
 
