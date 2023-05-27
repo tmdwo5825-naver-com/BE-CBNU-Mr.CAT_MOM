@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/BE-CBNU-Mr.CAT_MOM.iml" filepath="$PROJECT_DIR$/.idea/BE-CBNU-Mr.CAT_MOM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cat_mom.iml" filepath="$PROJECT_DIR$/.idea/cat_mom.iml" />
     </modules>
   </component>
 </project>

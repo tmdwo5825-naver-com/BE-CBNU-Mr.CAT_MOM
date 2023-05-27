@@ -12,13 +12,9 @@ class CatCreate(BaseModel):
 class CatResponse(BaseModel):
     x: float
     y: float
-    created_at: str
     comment: str
     url: str
-    cat_tower: str
-    geo_id: int
 
     class Config:
         orm_mode = True
-
 

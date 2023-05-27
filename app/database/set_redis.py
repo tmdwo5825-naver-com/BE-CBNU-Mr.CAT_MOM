@@ -6,7 +6,8 @@ def get_redis():
     r = redis.StrictRedis(
         host=settings.redis_host,
         port=settings.redis_port,
-        db=settings.redis_database
+        db=settings.redis_database,
+        charset="utf-8"
     )
     return r
 

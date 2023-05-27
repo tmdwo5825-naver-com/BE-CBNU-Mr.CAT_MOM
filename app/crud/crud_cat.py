@@ -39,7 +39,9 @@ class CrudCat():
         }
         # key 값을 image_url 로 설정함
         r.hmset(cat_in.image_url, data)
-        r.expire(f'{cat_in.image_url}', 30)
+        r.expire(f'{cat_in.image_url}', 3000)
+
+        r.set("key", cat_in.image_url)
 
         result = r.hmget(f'{cat_in.image_url}', 'image_url', 'comment', 'x', 'y', 'cat_tower')
         print(result)
@@ -47,18 +49,40 @@ class CrudCat():
 
     # noinspection PyMethodMayBeStatic
     def get_3h(self):
-        r = get_redis()
+        with get_redis() as r:
+            keys = []
+            init = 0
+            while True:
+                ret = r.scan(init)
+                init = ret[0]
+                keys.extend(ret[1])
 
-        # 모든 데이터 ID 가져 오기
-        data_ids = r.zcard('data_ids')
+                if init == 0:
+                    break
 
+            response = []
+            for i in keys:
+                #tmp = schemas.CatResponse3h()
+                print(r.hget(f'{i}', 'image_url')[0])
+                print(r.hget(f'{i}', 'comment')[0])
+                print(str(r.hget(f'{i}', 'x')[0]))
+                print(str(r.hget(f'{i}', 'y')[0]))
+                print(r.hget(f'{i}', 'cat_tower')[0])
+                #response.append(tmp)
+                #print(tmp)
+
+
+
+#        db_size = r.dbsize()
+#
         # 데이터 복원
-        all_data = []
-        for data_id in range(0, data_ids):
-            data = r.hgetall(data_id)
-            all_data.append(data)
+#        all_data = []
+#        for data_id in range(0, db_size):
+#            data = r.hgetall(data_id)
+#            all_data.append(data)
 
-        return all_data
+#        return all_data
 
 
 crud_cat = CrudCat()
+
