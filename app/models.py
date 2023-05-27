@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, VARCHAR, DateTime, text, FLOAT
 
-from .database.set_mysql import Base
+from app.database.set_mysql import Base
 
 
 class Cat(Base):
