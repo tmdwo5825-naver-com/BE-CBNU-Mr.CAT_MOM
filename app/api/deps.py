@@ -1,4 +1,5 @@
-
+import imghdr
+import imageio.v2 as imageio
 from tempfile import NamedTemporaryFile
 from typing import IO
 from math import radians, sin, cos, sqrt, atan2
@@ -15,10 +16,27 @@ def get_db():
         db.close()
 
 
+# 파일을 임시적으로 서버에 저장한다.
 async def save_file(file: IO):
     with NamedTemporaryFile("wb", delete=False) as tempfile:
         tempfile.write(file.read())
         return tempfile.name
+
+
+# 이미지 처리 함수 heic, jpg형식에 따라 파일 처리를 달리 한다.
+def process_image(file_path):
+    image_format = imghdr.what(file_path)  # Check the image format
+
+    if image_format == "heic":
+        # Convert HEIC image to JPEG
+        jpeg_path = "converted.jpg"
+        image = imageio.imread(file_path)
+        imageio.imsave(jpeg_path, image)
+        return jpeg_path
+    elif image_format == "jpeg" or image_format == "png":
+        return [file_path, image_format]
+    else:
+        raise ValueError("Unsupported image format")
 
 
 def check_location(x, y) -> str:
