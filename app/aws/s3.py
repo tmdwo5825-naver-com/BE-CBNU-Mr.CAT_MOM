@@ -20,7 +20,7 @@ def s3_connection():
         return s3
 
 
-def upload_file(file_path: str) -> str:
+def upload_file(file_path: str, content_type: str) -> str:
     s3 = s3_connection()
     try:
         obj_name = uuid.uuid1()
@@ -28,7 +28,7 @@ def upload_file(file_path: str) -> str:
             file_path,
             settings.s3_bucket_name,
             obj_name.hex,
-            ExtraArgs={'ACL':'public-read'}
+            ExtraArgs={'ACL':'public-read', 'ContentType': f"{content_type}"}
         )
         print("uploaded file!")
 
