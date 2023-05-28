@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 
+
 def save_data(data):
     r = get_redis()
     # 고유한 ID 생성
@@ -17,6 +18,7 @@ def save_data(data):
     r.hmset(key, data)
     # TTL 설정 (3시간)
     r.expire(key, 3 * 60 * 60)
+    print(data)
 
 
 def get_all_data():
@@ -28,6 +30,9 @@ def get_all_data():
     for key in all_keys:
         data = r.hgetall(key)
         data_str = {k.decode(): v.decode() for k, v in data.items()}
+        if 'cat_tower' in data_str:
+            del data_str['cat_tower']  # 'cat_tower' 필드가 있는 경우 삭제
+
         all_data.append(data_str)
 
     return all_data
@@ -76,7 +81,8 @@ class CrudCat():
             'image_url': cat_in.image_url,
             'comment': cat_in.comment,
             'x': cat_in.x,
-            'y': cat_in.y
+            'y': cat_in.y,
+            'cat_tower': cat_in.cat_tower
         }
         save_data(data)
 
@@ -85,6 +91,48 @@ class CrudCat():
         response = get_all_data()
         print(response)
         return response
+
+    def count_data(self):
+        r = get_redis()
+        all_keys = r.keys('cat_data:*')
+        n14_count = 0
+        lib_count = 0
+        domitory_sungjae_count = 0
+        domitory_jinjae_count = 0
+
+        for key in all_keys:
+            data = r.hgetall(key)
+            data_str = {k.decode(): v.decode() for k, v in data.items()}
+            print(data_str.get('cat_tower'))
+            if data_str.get('cat_tower') == "n14":
+                n14_count += 1
+            elif data_str.get('cat_tower') == "lib":
+                lib_count += 1
+            elif data_str.get('cat_tower') == "sungjae":
+                domitory_sungjae_count += 1
+            elif data_str.get('cat_tower') == "jinjae":
+                domitory_jinjae_count += 1
+
+        return {
+        "data2": [
+            {
+                "id": 1,
+                "count": domitory_sungjae_count
+            },
+            {
+                "id": 2,
+                "count": n14_count
+            },
+            {
+                "id": 3,
+                "count": lib_count
+            },
+            {
+                "id": 4,
+                "count": domitory_jinjae_count
+            }
+        ]
+    }
 
 
 #        db_size = r.dbsize()
