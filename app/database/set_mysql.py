@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from .. core.config import settings
 
 
-DB_URL = "mysql+pymysql://%s:%s@%s:%s/%s" % (
+DB_URL = "mysql+pymysql://%s:%s@%s:%s/%s?charset=utf8mb4" % (
     settings.mysql_user,
     settings.mysql_password,
     settings.mysql_host,
