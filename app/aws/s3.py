@@ -3,6 +3,7 @@ from botocore.exceptions import ClientError
 from botocore.exceptions import NoCredentialsError
 import uuid
 from app.core.config import settings
+from fastapi import UploadFile, File
 
 
 def s3_connection():
@@ -20,15 +21,17 @@ def s3_connection():
         return s3
 
 
-def upload_file(file_path: str, content_type: str) -> str:
+async def upload_file(image_object: UploadFile = File(...), content_type: str = None) -> str:
     s3 = s3_connection()
+    image_byte = await image_object.read()
     try:
         obj_name = uuid.uuid1()
-        s3.upload_file(
-            file_path,
-            settings.s3_bucket_name,
-            obj_name.hex,
-            ExtraArgs={'ACL':'public-read', 'ContentType': f"{content_type}"}
+        s3.put_object(
+            Bucket=settings.s3_bucket_name,
+            Key=obj_name.hex,
+            Body=image_byte,
+            ACL='public-read',
+            ContentType=f'image/{content_type}'
         )
         print("uploaded file!")
 
