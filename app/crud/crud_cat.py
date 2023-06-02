@@ -7,12 +7,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 
-
 def save_data(data):
+    print("call save data")
     r = get_redis()
+    print("get redis obj")
     # 고유한 ID 생성
     unique_id = r.incr('cat_data_id')
     key = f'cat_data:{unique_id}'
+    print("get unique id")
 
     # 데이터 저장
     r.hmset(key, data)
@@ -76,6 +78,7 @@ class CrudCat():
 
     # noinspection PyMethodMayBeStatic
     def create_3h_content(self, cat_in: schemas.CatCreate):
+        print("crud func call done")
         # 필드와 값을 함께 저장
         data = {
             'image_url': cat_in.image_url,
@@ -133,17 +136,6 @@ class CrudCat():
             }
         ]
     }
-
-
-#        db_size = r.dbsize()
-#
-        # 데이터 복원
-#        all_data = []
-#        for data_id in range(0, db_size):
-#            data = r.hgetall(data_id)
-#            all_data.append(data)
-
-#        return all_data
 
 
 crud_cat = CrudCat()
