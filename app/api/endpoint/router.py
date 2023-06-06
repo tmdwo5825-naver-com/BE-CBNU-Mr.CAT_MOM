@@ -9,6 +9,9 @@ from app.database.set_mysql import engine, get_db
 from app.api.common.get_cat_tower import check_location
 from app.api.common.process_image import process_image
 
+from app.aws.s3 import upload_file
+from app.core.config import settings
+
 
 import time
 
@@ -34,7 +37,7 @@ async def create_content(
         )
 
     # 이미지 처리
-    image_url = process_image(image)
+    image_url = await process_image(image)
 
     # 객체 처리
     cat_tower = check_location(lat, lon)
