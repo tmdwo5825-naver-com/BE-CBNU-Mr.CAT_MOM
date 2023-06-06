@@ -1,25 +1,36 @@
 from app import models, schemas
 from app.models import Cat
 from app.database.set_redis import get_redis
+import redis
 
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from redis.exceptions import ConnectionError, RedisError
 
 
 def save_data(data):
     print("call save data")
-    r = get_redis()
+    try:
+        r = get_redis()
+        r.ping()  # 커넥션 확인
+    except ConnectionError as ce:
+        raise HTTPException(status_code=500, detail="Redis Connection Error") from ce
+
     print("get redis obj")
+
     # 고유한 ID 생성
     unique_id = r.incr('cat_data_id')
     key = f'cat_data:{unique_id}'
     print("get unique id")
 
     # 데이터 저장
-    r.hmset(key, data)
+    try:
+        r.hmset(key, data)
     # TTL 설정 (3시간)
-    r.expire(key, 3 * 60 * 60)
+        r.expire(key, 3 * 60 * 60)
+    except RedisError as re:
+        raise HTTPException(status_code=500, detail="Redis Data Save Error") from re
     print(data)
 
 

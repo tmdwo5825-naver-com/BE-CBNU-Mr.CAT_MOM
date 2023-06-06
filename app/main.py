@@ -15,6 +15,7 @@ app.include_router(router.router)
 
 
 origins = [
+    "https://catmom22.vercel.app",
     "*"
 ]
 

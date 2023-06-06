@@ -1,0 +1,20 @@
+version: '3'
+services:
+  cat_mom:
+    image: "bsj1209/cat_mom:latest"
+    ports:
+      - "80:80"
+    container_name: cat_mom
+    networks:
+      - our_net
+  redis:
+    image: "redis:alpine"
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    networks:
+      - our_net
+
+networks:
+  our_net:
+    driver: bridge
