@@ -18,13 +18,13 @@ async def save_data(data):
     except ConnectionError as ce:
         raise HTTPException(status_code=500, detail="Redis Connection Error") from ce
 
+    try:
         print("get redis obj")
         # 고유한 ID 생성
         unique_id = redis_conn.incr('cat_data_id')
         key = f'cat_data:{unique_id}'
         print("get unique id")
-
-    try:
+    
         # 데이터 저장
         redis_conn.hmset(key, data)
         # TTL 설정 (3시간)
@@ -34,6 +34,7 @@ async def save_data(data):
         raise HTTPException(status_code=500, detail="Redis Data Save Error") from re
     finally:
         redis_conn.close()
+
 
 
 def get_all_data():
