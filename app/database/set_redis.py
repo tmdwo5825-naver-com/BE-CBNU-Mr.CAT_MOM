@@ -1,5 +1,6 @@
 from app.core.config import settings
 import redis
+from redis.exceptions import ConnectionError
 
 
 def get_redis():
@@ -9,4 +10,3 @@ def get_redis():
         db=0,
     )
     return r
-

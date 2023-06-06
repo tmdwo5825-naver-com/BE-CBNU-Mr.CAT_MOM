@@ -1,17 +1,6 @@
 from math import radians, sin, cos, sqrt, atan2
 
 
-from .. database.set_mysql import SessionLocal
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 def check_location(lat, lon) -> str:
     def haversine(lat1, lon1, lat2, lon2):
         R = 6371  # 지구의 반경(단위: km)

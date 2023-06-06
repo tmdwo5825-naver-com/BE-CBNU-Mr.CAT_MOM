@@ -21,9 +21,8 @@ def s3_connection():
         return s3
 
 
-async def upload_file(image_object: UploadFile = File(...), content_type: str = None) -> str:
+def upload_file(image_byte: bytes, content_type: str = None) -> str:
     s3 = s3_connection()
-    image_byte = await image_object.read()
     try:
         obj_name = uuid.uuid1()
         s3.put_object(
