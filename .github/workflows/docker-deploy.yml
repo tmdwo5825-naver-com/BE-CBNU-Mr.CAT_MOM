@@ -18,7 +18,7 @@ jobs:
     - name: setting .env file
       uses: actions/checkout@v3
     - run: touch ./app/core/.env
-    - run: echo "${{ env.ENV_FILE }}" > ./app/core/.
+    - run: echo "${{ env.ENV_FILE }}" > ./app/core/.env
 
 
     - name: Docker build
