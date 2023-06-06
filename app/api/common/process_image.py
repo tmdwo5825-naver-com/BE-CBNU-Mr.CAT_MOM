@@ -4,7 +4,7 @@ from app.aws.s3 import upload_file
 from app.core.config import settings
 
 
-def process_image(image: UploadFile = File(...)):
+async def process_image(image: UploadFile = File(...)):
     print("call process_image")
     # 파일 처리 부분
 
@@ -12,9 +12,9 @@ def process_image(image: UploadFile = File(...)):
     print(file_type)
 
     if file_type == "jpeg" or file_type == "jpg" or file_type == "png":
-        image_byte = image.read()
+        image_byte = await image.read()
         # 파일 s3에 업로드
-        obj_name = upload_file(image_byte, file_type)
+        obj_name = await upload_file(image_byte)
 
         image_url = f'https://{settings.s3_bucket_name}.s3.amazonaws.com/{obj_name}'
         return image_url

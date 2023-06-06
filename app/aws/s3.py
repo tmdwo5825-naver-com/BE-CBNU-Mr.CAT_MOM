@@ -21,7 +21,7 @@ def s3_connection():
         return s3
 
 
-def upload_file(image_byte: bytes, content_type: str = None) -> str:
+async def upload_file(image_byte: bytes) -> str:
     s3 = s3_connection()
     try:
         obj_name = uuid.uuid1()
@@ -30,7 +30,7 @@ def upload_file(image_byte: bytes, content_type: str = None) -> str:
             Key=obj_name.hex,
             Body=image_byte,
             ACL='public-read',
-            ContentType=f'image/{content_type}'
+            ContentType='image/jpeg'
         )
         print("uploaded file!")
 
