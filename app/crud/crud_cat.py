@@ -1,8 +1,9 @@
 from app import models, schemas
 from app.models import Cat
 from app.database.set_redis import get_redis
-from redis.exceptions import DataError, ConnectionError, TimeoutError
 
+from fastapi import HTTPException
+from redis.exceptions import DataError, TimeoutError, ConnectionError, RedisError
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -10,30 +11,29 @@ from sqlalchemy.orm import Session
 
 async def save_data(data):
     print("call save data")
-    redis_conn = await get_redis()
-    if redis_conn:
-        try:
-            print("get redis obj")
-            # 고유한 ID 생성
-            unique_id = redis_conn.incr('cat_data_id') 
-            key = f'cat_data:{unique_id}'
-            print("get unique id")
 
-            # 데이터 저장
-            redis_conn.hmset(key, data)
-            # TTL 설정 (3시간)
-            redis_conn.expire(key, 3 * 60 * 60)
-            print(data)
-        except ConnectionError as e:
-            print("Connection error:", e)
-        except DataError as e:
-            print("Data error:", e)
-        except TimeoutError as e:
-            print("Timeout error:", e)
-        finally:
-            redis_conn.close()
-    else:
-        print("Failed to connect to Redis.")
+    try:
+        redis_conn = get_redis()
+        redis_conn.ping()  # 커넥션 확인
+    except ConnectionError as ce:
+        raise HTTPException(status_code=500, detail="Redis Connection Error") from ce
+
+        print("get redis obj")
+        # 고유한 ID 생성
+        unique_id = redis_conn.incr('cat_data_id')
+        key = f'cat_data:{unique_id}'
+        print("get unique id")
+
+    try:
+        # 데이터 저장
+        redis_conn.hmset(key, data)
+        # TTL 설정 (3시간)
+        redis_conn.expire(key, 3 * 60 * 60)
+        print(data)
+    except RedisError as re:
+        raise HTTPException(status_code=500, detail="Redis Data Save Error") from re
+    finally:
+        redis_conn.close()
 
 
 def get_all_data():
