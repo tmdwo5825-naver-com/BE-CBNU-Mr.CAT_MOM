@@ -1,26 +1,39 @@
 from app import models, schemas
 from app.models import Cat
 from app.database.set_redis import get_redis
+from redis.exceptions import DataError, ConnectionError, TimeoutError
 
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 
-def save_data(data):
+async def save_data(data):
     print("call save data")
-    r = get_redis()
-    print("get redis obj")
-    # 고유한 ID 생성
-    unique_id = r.incr('cat_data_id')
-    key = f'cat_data:{unique_id}'
-    print("get unique id")
+    redis_conn = await get_redis()
+    if redis_conn:
+        try:
+            print("get redis obj")
+            # 고유한 ID 생성
+            unique_id = redis_conn.incr('cat_data_id') 
+            key = f'cat_data:{unique_id}'
+            print("get unique id")
 
-    # 데이터 저장
-    r.hmset(key, data)
-    # TTL 설정 (3시간)
-    r.expire(key, 3 * 60 * 60)
-    print(data)
+            # 데이터 저장
+            redis_conn.hmset(key, data)
+            # TTL 설정 (3시간)
+            redis_conn.expire(key, 3 * 60 * 60)
+            print(data)
+        except ConnectionError as e:
+            print("Connection error:", e)
+        except DataError as e:
+            print("Data error:", e)
+        except TimeoutError as e:
+            print("Timeout error:", e)
+        finally:
+            redis_conn.close()
+    else:
+        print("Failed to connect to Redis.")
 
 
 def get_all_data():
@@ -77,7 +90,7 @@ class CrudCat():
             return []
 
     # noinspection PyMethodMayBeStatic
-    def create_3h_content(self, cat_in: schemas.CatCreate):
+    async def create_3h_content(self, cat_in: schemas.CatCreate):
         print("crud func call done")
         # 필드와 값을 함께 저장
         data = {
@@ -87,7 +100,7 @@ class CrudCat():
             'y': cat_in.y,
             'cat_tower': cat_in.cat_tower
         }
-        save_data(data)
+        await save_data(data)
 
     # noinspection PyMethodMayBeStatic
     def get_3h(self):

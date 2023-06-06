@@ -49,7 +49,7 @@ async def create_content(
     print("db done")
 
     # redis 저장
-    crud_cat.create_3h_content(request)
+    await crud_cat.create_3h_content(request)
 
     end = time.time()
     result = end - start
@@ -95,4 +95,3 @@ async def upload_image(file: UploadFile = File(...)):
 
     # 파일 내용 읽기 (as bytes)
     contents = await file.read()
-    upload_file(filename,)
