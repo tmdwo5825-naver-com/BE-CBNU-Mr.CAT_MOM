@@ -1,0 +1,45 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./
+      ENV_FILE: ${{ secrets.ENV_FILE }}
+
+
+    steps:
+    - name: setting .env file
+      uses: actions/checkout@v3
+    - run: touch ./app/core/.env
+    - run: echo "${{ env.ENV_FILE }}" > ./app/core/.
+
+
+    - name: Docker build
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker build -t ${{ secrets.PROJECT_NAME }} .
+        docker tag ${{ secrets.PROJECT_NAME }} ${{ secrets.DOCKER_HUB_REPO }}:${GITHUB_SHA::7}
+        docker push ${{ secrets.DOCKER_HUB_REPO }}:${GITHUB_SHA::7}
+        
+
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.AZURE_USER }}
+        key: ${{ secrets.AZURE_SECRET }}
+        envs: GITHUB_SHA
+        script: |
+          docker rm -f ${{ secrets.PROJECT_NAME }}
+          docker rmi $(docker images -q)
+          docker pull ${{ secrets.DOCKER_HUB_REPO }}:${GITHUB_SHA::7}
+          docker tag ${{ secrets.DOCKER_HUB_REPO }}:${GITHUB_SHA::7} ${{ secrets.PROJECT_NAME }}
+          docker rm -f ${{ secrets.PROJECT_NAME }}
+          docker run -d --name ${{ secrets.PROJECT_NAME }} --net azureuser_our_net -p 80:80 ${{ secrets.PROJECT_NAME }}:latest
