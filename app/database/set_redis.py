@@ -3,11 +3,10 @@ import redis
 
 
 def get_redis():
-    r = redis.StrictRedis(
-        host=settings.redis_host,
-        port=settings.redis_port,
-        db=settings.redis_database,
-        charset="utf-8"
+    r = redis.Redis(
+        host='redis_container',
+        port=6379,
+        db=0,
     )
     return r
 

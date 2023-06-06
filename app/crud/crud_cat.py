@@ -1,23 +1,36 @@
 from app import models, schemas
 from app.models import Cat
 from app.database.set_redis import get_redis
+import redis
 
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-
+from redis.exceptions import ConnectionError, RedisError
 
 
 def save_data(data):
-    r = get_redis()
+    print("call save data")
+    try:
+        r = get_redis()
+        r.ping()  # 커넥션 확인
+    except ConnectionError as ce:
+        raise HTTPException(status_code=500, detail="Redis Connection Error") from ce
+
+    print("get redis obj")
+
     # 고유한 ID 생성
     unique_id = r.incr('cat_data_id')
     key = f'cat_data:{unique_id}'
+    print("get unique id")
 
     # 데이터 저장
-    r.hmset(key, data)
+    try:
+        r.hmset(key, data)
     # TTL 설정 (3시간)
-    r.expire(key, 3 * 60 * 60)
+        r.expire(key, 3 * 60 * 60)
+    except RedisError as re:
+        raise HTTPException(status_code=500, detail="Redis Data Save Error") from re
     print(data)
 
 
@@ -76,6 +89,7 @@ class CrudCat():
 
     # noinspection PyMethodMayBeStatic
     def create_3h_content(self, cat_in: schemas.CatCreate):
+        print("crud func call done")
         # 필드와 값을 함께 저장
         data = {
             'image_url': cat_in.image_url,
@@ -133,17 +147,6 @@ class CrudCat():
             }
         ]
     }
-
-
-#        db_size = r.dbsize()
-#
-        # 데이터 복원
-#        all_data = []
-#        for data_id in range(0, db_size):
-#            data = r.hgetall(data_id)
-#            all_data.append(data)
-
-#        return all_data
 
 
 crud_cat = CrudCat()
