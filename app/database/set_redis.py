@@ -4,8 +4,8 @@ import redis
 
 def get_redis():
     r = redis.Redis(
-        host='redis_container',
-        port=6379,
+        host=settings.redis_host,
+        port=settings.redis_port,
         db=0,
     )
     return r
