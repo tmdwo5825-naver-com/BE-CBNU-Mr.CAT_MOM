@@ -8,10 +8,9 @@ from app.crud.crud_redis import crud_redis
 from app.database.set_mysql import engine, get_db
 from app.api.common.get_cat_tower import check_location
 from app.api.common.process_image import process_image
+from app.api.common.process_time import process_time
 
-from app.aws.s3 import upload_file
-from app.core.config import settings
-
+import uuid
 
 import time
 
@@ -26,6 +25,10 @@ async def create_content(
         lat: float = Form(description="float형 위도"),
         lon: float = Form(description="경도"),
         image: UploadFile = File(description="클라이언트가 업로드할 이미지"),
+        month: int = Form(description="업로드 월"),
+        day: int = Form(description="업로드 일"),
+        hour: int = Form(description="업로드 시간"),
+        min: int = Form(description="업로드 분"),
         db: Session = Depends(get_db)
 ):
     start = time.time()
@@ -37,18 +40,23 @@ async def create_content(
         )
 
     # 이미지 처리
-    image_url = await process_image(image)
+    obj_name = uuid.uuid1().hex
+    print(obj_name + "1")
+    image_url = await process_image(image, obj_name)
 
     # 객체 처리
-    cat_tower = check_location(lat, lon)
-    request = schemas.CatCreate(comment=comment, image_url=image_url, x=lon, y=lat, cat_tower=cat_tower)
+    print("doing another task")
+    cat_tower = await check_location(lat, lon)
 
     # db 저장
-    crud_mysql.create_24h_content(db, request)
+    upload_time = process_time.get_static_time(day, hour, min)
+    request_mysql = schemas.CatCreateMysql(comment=comment, image_url=image_url, x=lon, y=lat, upload_time=upload_time)
+    crud_mysql.create_24h_content(db, request_mysql)
     print("db done")
 
     # redis 저장
-    crud_redis.create_3h_content(request)
+    request_redis = schemas.CatCreateRedis(comment=comment, image_url=image_url, x=lon, y=lat, cat_tower=cat_tower, hour=hour, min=min)
+    crud_redis.create_3h_content(request_redis)
 
     end = time.time()
     result = end - start

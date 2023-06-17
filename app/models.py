@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, VARCHAR, DateTime, text, FLOAT
+from sqlalchemy import Column, Integer, VARCHAR, DateTime, text, FLOAT, String
 
 from app.database.set_mysql import Base
+
+
 class Cat(Base):
     __tablename__ = "cat_mom"
     geo_id = Column(Integer, primary_key=True, nullable=False, autoincrement=True )
@@ -9,7 +11,7 @@ class Cat(Base):
     comment = Column(VARCHAR(500), nullable=True)
     x = Column(FLOAT)
     y = Column(FLOAT)
-    cat_tower = Column(VARCHAR(100))
+    upload_time = Column(String(100))
 
 
 

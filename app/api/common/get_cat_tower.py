@@ -1,7 +1,7 @@
 from math import radians, sin, cos, sqrt, atan2
 
 
-def check_location(lat, lon) -> str:
+async def check_location(lat, lon) -> str:
     def haversine(lat1, lon1, lat2, lon2):
         R = 6371  # 지구의 반경(단위: km)
 
