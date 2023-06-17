@@ -4,9 +4,9 @@ from redis.exceptions import ConnectionError
 
 
 def get_redis():
-    r = redis.Redis(
+    redis_connection = redis.Redis(
         host=settings.redis_host,
         port=settings.redis_port,
         db=0,
     )
-    return r
+    return redis_connection
