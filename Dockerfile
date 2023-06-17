@@ -1,5 +1,5 @@
 # 나의 python 버전
-FROM python:3.9
+FROM python:slim
 
 # /code 폴더 만들기
 WORKDIR /code

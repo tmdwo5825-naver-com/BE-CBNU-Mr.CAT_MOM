@@ -9,8 +9,13 @@ from app.database.set_mysql import engine, get_db
 from app.api.common.get_cat_tower import check_location
 from app.api.common.process_image import process_image
 from app.api.common.process_time import process_time
+from app.aws.s3 import upload_file
+from app.core.config import settings
+
 
 import uuid
+
+
 
 import time
 
@@ -40,9 +45,11 @@ async def create_content(
         )
 
     # 이미지 처리
+
     obj_name = uuid.uuid1().hex
     print(obj_name + "1")
     image_url = await process_image(image, obj_name)
+
 
     # 객체 처리
     print("doing another task")

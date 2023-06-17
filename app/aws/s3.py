@@ -21,8 +21,10 @@ def s3_connection():
         return s3
 
 
+
 def upload_file(image_byte: bytes, obj_name: str) -> str:
     print("call s3 upload file")
+
     s3 = s3_connection()
     try:
         obj_name = uuid.uuid1()
