@@ -1,5 +1,6 @@
 from app import schemas
 from app.database.set_redis import get_redis
+from app.api.common.process_time import process_time
 
 from fastapi import HTTPException
 from redis.exceptions import ConnectionError, RedisError
@@ -47,6 +48,14 @@ def get_all_data():
             data_str = {k.decode(): v.decode() for k, v in data.items()}
             if 'cat_tower' in data_str:
                 del data_str['cat_tower']  # 'cat_tower' 필드가 있는 경우 삭제
+
+            recent_time = process_time.get_recent_time(hour_ago=data_str['hour'], min_ago=data_str['min'])
+            del data_str['hour']
+            del data_str['min']
+            data_str['upload_time'] = recent_time
+
+            data_str['x'] = float(data_str['x'])
+            data_str['y'] = float(data_str['y'])
 
             all_data.append(data_str)
 
@@ -102,7 +111,7 @@ def count_data():
 class CrudRedis():
 
     # noinspection PyMethodMayBeStatic
-    def create_3h_content(self, cat_in: schemas.CatCreate):
+    def create_3h_content(self, cat_in: schemas.CatCreateRedis):
         print("crud func call done")
         # 필드와 값을 함께 저장
         data = {
@@ -110,7 +119,9 @@ class CrudRedis():
             'comment': cat_in.comment,
             'x': cat_in.x,
             'y': cat_in.y,
-            'cat_tower': cat_in.cat_tower
+            'cat_tower': cat_in.cat_tower,
+            'hour': cat_in.hour,
+            'min': cat_in.min
         }
         save_data(data)
 

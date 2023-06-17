@@ -3,18 +3,18 @@ from app.models import Cat
 
 from datetime import datetime, timedelta
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 
 class CrudMysql():
     # noinspection PyMethodMayBeStatic
-    def create_24h_content(self, db: Session, cat_in: schemas.CatCreate):
+    def create_24h_content(self, db: Session, cat_in: schemas.CatCreateMysql):
         db_cat = models.Cat(
             x=cat_in.x,
             y=cat_in.y,
             image_url=cat_in.image_url,
             comment=cat_in.comment,
-            cat_tower=cat_in.cat_tower
+            upload_time=cat_in.upload_time
         )
         db.add(db_cat)
         db.commit()
@@ -32,7 +32,7 @@ class CrudMysql():
             time_threshold = current_time - timedelta(hours=24)
 
             # 쿼리 실행
-            query = db.query(Cat).filter(Cat.created_at >= time_threshold).all()
+            query = db.query(Cat).options(load_only(Cat.image_url, Cat.comment, Cat.x, Cat.y, Cat.upload_time)).filter(Cat.created_at >= time_threshold).all()
 
             # 결과 반환
             return query

@@ -1,12 +1,22 @@
 from pydantic import BaseModel
 
 
-class CatCreate(BaseModel):
+class CatCreateMysql(BaseModel):
+    comment: str
+    image_url: str
+    x: float
+    y: float
+    upload_time: str
+
+
+class CatCreateRedis(BaseModel):
     comment: str
     image_url: str
     x: float
     y: float
     cat_tower: str
+    hour: int
+    min: int
 
 
 class CatResponse(BaseModel):
