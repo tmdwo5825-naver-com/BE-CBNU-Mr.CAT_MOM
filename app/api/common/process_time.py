@@ -5,15 +5,15 @@ class ProcessTime():
     def get_static_time(self, day, hour, min) :
         if hour > 12:
             hour -= 12
-            static_time = f"오후 {day}일 {hour}시 {min}분"
+            static_time = f"{day}일 오후 {hour}시 {min}분"
         else:
-            static_time = f"오전 {day}일 {hour}시 {min}분"
+            static_time = f"{day}일 오후 {hour}시 {min}분"
 
         return static_time
 
     def get_recent_time(self, hour_ago, min_ago):
         hour_ago = int(hour_ago)
-        hour_now = int(datetime.today().hour)
+        hour_now = int(datetime.today().hour) + 9
         if hour_now < 3:
             hour_now = 24 + hour_now
 
