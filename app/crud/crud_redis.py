@@ -113,6 +113,7 @@ class CrudRedis():
     # noinspection PyMethodMayBeStatic
     def create_3h_content(self, cat_in: schemas.CatCreateRedis):
         print("crud func call done")
+
         # 필드와 값을 함께 저장
         data = {
             'image_url': cat_in.image_url,
