@@ -19,6 +19,7 @@ class CrudMysql():
         db.add(db_cat)
         db.commit()
         db.refresh(db_cat)
+        db.close()
         return db_cat
 
     # noinspection PyMethodMayBeStatic
@@ -33,7 +34,7 @@ class CrudMysql():
 
             # 쿼리 실행
             query = db.query(Cat).options(load_only(Cat.image_url, Cat.comment, Cat.x, Cat.y, Cat.upload_time)).filter(Cat.created_at >= time_threshold).all()
-
+            db.close()
             # 결과 반환
             return query
 
